@@ -1,0 +1,93 @@
+[
+  {
+    "id": "artemis-2",
+    "nombre": "Artemis II",
+    "empresa": "NASA",
+    "estado": "en-curso",
+    "descripcion": "La misión Artemis II es el primer vuelo tripulado del cohete SLS y la nave Orion. Durante un viaje de 10 días, cuatro astronautas realizarán un sobrevuelo lunar para certificar sistemas de soporte vital.",
+    "fecha": "Abril 2026",
+    "ficha_digital": true,
+    "portada": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Artemis_II_patch.png/800px-Artemis_II_patch.png",
+    "link": "live.html",
+    "detalles_tecnicos": {
+      "nave": "Orion MPCV",
+      "cohete": "SLS Block 1",
+      "velocidad_actual": "32,100 km/h",
+      "distancia_tierra": "384,400 km (Aprox.)",
+      "altitud_lunar": "10,300 km",
+      "duracion_mision": "10 días",
+      "objetivo": "Sobrevuelo Lunar",
+      "tripulantes_datos": [
+        {
+          "nombre": "Reid Wiseman",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Reid_Wiseman_official_portrait.jpg/480px-Reid_Wiseman_official_portrait.jpg"
+        },
+        {
+          "nombre": "Victor Glover",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Victor_Glover_official_portrait.jpg/480px-Victor_Glover_official_portrait.jpg"
+        },
+        {
+          "nombre": "Christina Koch",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Christina_Koch_official_portrait.jpg/480px-Christina_Koch_official_portrait.jpg"
+        },
+        {
+          "nombre": "Jeremy Hansen",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Jeremy_Hansen_official_portrait.jpg/480px-Jeremy_Hansen_official_portrait.jpg"
+        }
+      ],
+      "plan_vuelo": [
+        {
+          "tiempo": "T+ 00:00",
+          "accion": "Lanzamiento desde Kennedy Space Center"
+        },
+        {
+          "tiempo": "T+ 02:12",
+          "accion": "Separación de propulsores sólidos (SRB)"
+        },
+        {
+          "tiempo": "T+ 08:48",
+          "accion": "Corte de motor principal y separación de etapa central"
+        },
+        {
+          "tiempo": "Día 1",
+          "accion": "Inyección Trans-Lunar (TLI)"
+        }
+      ],
+      "multimedia": [
+        "https://www.nasa.gov/wp-content/uploads/2026/04/art002e009288orig.jpg?w=1024",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Artemis_1_SLS_Launch.jpg/1024px-Artemis_1_SLS_Launch.jpg"
+      ]
+    }
+  },
+  {
+    "id": "apollo-11",
+    "nombre": "Apollo 11",
+    "empresa": "NASA",
+    "estado": "completada",
+    "descripcion": "Misión histórica que logró el primer alunizaje humano en el Mar de la Tranquilidad.",
+    "fecha": "Julio 1969",
+    "ficha_digital": true,
+    "portada": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Apollo_11_Official_Crew_Photo.jpg/1024px-Apollo_11_Official_Crew_Photo.jpg",
+    "detalles_tecnicos": {
+      "nave": "Módulo Lunar Eagle",
+      "cohete": "Saturn V",
+      "velocidad_max": "39,897 km/h",
+      "tiempo_en_luna": "21h 36m",
+      "carga_muestras": "21.5 kg de roca lunar",
+      "tripulantes_datos": [
+        {
+          "nombre": "Neil Armstrong",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Neil_Armstrong_pose.jpg/480px-Neil_Armstrong_pose.jpg"
+        },
+        {
+          "nombre": "Buzz Aldrin",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Buzz_Aldrin.jpg/480px-Buzz_Aldrin.jpg"
+        },
+        {
+          "nombre": "Michael Collins",
+          "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Michael_Collins_official_NASA_photo.jpg/480px-Michael_Collins_official_NASA_photo.jpg"
+        }
+      ]
+    }
+  }
+]

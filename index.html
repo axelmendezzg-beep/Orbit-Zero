@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit Zero</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">
+            <div class="logo">ORBIT ZERO</div>
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon" style="color:var(--orbit-blue)">🔍</span>
+                    <input type="text" id="mainSearch" placeholder="Buscar..." oninput="showSuggestions()" onkeyup="handleEnter(event)">
+                </div>
+                <div id="suggestions" class="suggestions-list"></div>
+            </div>
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+        <div class="menu-overlay" id="menuOverlay">
+    <a href="index.html" onclick="toggleMenu()">Inicio</a>
+    <a href="misiones.html" onclick="toggleMenu()">Misiones</a> <a href="map.html" onclick="toggleMenu()">Mapa</a>
+    <a href="live.html" onclick="toggleMenu()">En Vivo</a>
+    <hr style="width: 30%; border: 0; border-top: 1px solid #333; margin: 20px 0;">
+    <a href="privacidad.html" onclick="toggleMenu()" style="font-size: 1rem; color:#a4a4a4;">Privacidad</a>
+</div>
+
+    <header id="apod-section">
+        <div class="apod-content">
+            <span class="apod-badge">Imagen del día</span>
+            <h1 id="apod-title">Conectando...</h1>
+        </div>
+    </header>
+
+     <div id="active-missions" class="section-container">
+        </div>
+
+    <div id="upcoming-missions" class="section-container" style="padding-top: 0;">
+        </div>
+
+    <section class="section-container">
+        <button class="btn-map" onclick="window.location.href='map.html'">ABRIR MAPA GLOBAL 🌍</button>
+    </section>
+        <footer>
+        <div class="footer-quote">
+            "La duda es el origen de la sabiduría"
+ <br>— René Descartes
+        </div>
+        <div class="footer-credits">
+            Orbit Team 
+        </div>
+        <div class="footer-copy">
+            Orbit Zero 2026 ©
+        </div>
+    </footer>
+    
+
+    <script>
+    // --- 1. VARIABLES GLOBALES ---
+    let orbitDB = [];
+    const apiKey = 'AvJL8JJyAyffXplHYi0FLQvqcNG6cAo7D4U8U4hd';
+
+    // --- 2. FUNCIONES DE CARGA ---
+
+    // Carga misiones dinámicas (Activas y Próximas) desde missions.json con ruteo inteligente
+    async function loadMissionsIndex() {
+        try {
+            const res = await fetch('missions.json');
+            const missions = await res.json();
+            const activeBox = document.getElementById('active-missions');
+            const upcomingBox = document.getElementById('upcoming-missions');
+
+            // Renderizar "En curso"
+            const active = missions.filter(m => m.estado === "en-curso");
+            if(active.length > 0) {
+                activeBox.innerHTML = `<h2>Misiones en Curso</h2>` + active.map(m => {
+                    // Si tiene ficha digital, va a ficha.html, si no, usa su link original
+                    const destination = m.ficha_digital ? `ficha.html?id=${m.id}` : m.link;
+                    
+                    return `
+                    <a href="${destination}" class="card">
+                        <div class="card-header">
+                            <h3 style="margin:0; color:var(--orbit-blue); display:flex; align-items:center;">
+                                <span class="status-dot"></span>${m.nombre}
+                            </h3>
+                            <span class="company-tag">${m.empresa}</span>
+                        </div>
+                        <p style="font-size:0.9rem; color:#ccc;">${m.descripcion}</p>
+                    </a>`;
+                }).join('');
+            }
+
+            // Renderizar "Próximamente"
+            const upcoming = missions.filter(m => m.estado === "proximamente");
+            if(upcoming.length > 0) {
+                upcomingBox.innerHTML = `<h2>Próximas Misiones</h2>` + upcoming.map(m => {
+                    // Aplicamos la misma lógica de destino para las próximas
+                    const destination = m.ficha_digital ? `ficha.html?id=${m.id}` : (m.link || '#');
+                    
+                    return `
+                    <div class="card" onclick="window.location.href='${destination}'" style="cursor:pointer;">
+                        <div class="card-header">
+                            <h3 style="margin:0;">${m.nombre}</h3>
+                            <span class="company-tag">${m.empresa}</span>
+                        </div>
+                        <p style="font-size:0.85rem; color:#aaa;">${m.descripcion}</p>
+                    </div>`;
+                }).join('');
+            }
+        } catch (e) { console.error("Fallo en missions.json:", e); }
+    }
+
+    // Carga y unifica ambas bases de datos para el buscador
+    async function loadDatabase() {
+        try {
+            const [resOrbit, resMissions] = await Promise.all([
+                fetch('orbit-data.json'),
+                fetch('missions.json')
+            ]);
+            const dataOrbit = await resOrbit.json();
+            const dataMissions = await resMissions.json();
+
+            // Unificamos cuerpos celestes y misiones en una sola lista de búsqueda
+            // Nota: El buscador ahora también encontrará misiones de missions.json
+            orbitDB = [...dataOrbit.cuerpos_celestes, ...dataMissions];
+            console.log("Base de datos unificada con éxito.");
+        } catch (err) { console.error("Error unificando bases de datos:", err); }
+    }
+
+    // Obtener Imagen del Día (APOD) de la NASA
+    async function getApod() {
+        try {
+            const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}`);
+            const data = await response.json();
+            if(data.media_type !== "image") {
+                const fallbackRes = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}&date=2026-04-07`);
+                const fallbackData = await fallbackRes.json();
+                renderData(fallbackData);
+            } else { renderData(data); }
+        } catch (err) { document.getElementById('apod-title').innerText = "Sistema fuera de línea"; }
+    }
+
+    function renderData(data) {
+        const section = document.getElementById('apod-section');
+        const titleElement = document.getElementById('apod-title');
+        section.style.backgroundImage = `url('${data.hdurl || data.url}')`;
+        titleElement.innerText = data.title;
+    }
+
+    // --- 3. INTERFAZ Y NAVEGACIÓN ---
+
+    function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
+
+    function showSuggestions() {
+        const input = document.getElementById('mainSearch').value.toLowerCase();
+        const list = document.getElementById('suggestions');
+        if (input.length < 1) { list.style.display = "none"; return; }
+        
+        const filtered = orbitDB.filter(item => item.nombre.toLowerCase().includes(input));
+        
+        if (filtered.length > 0) {
+            list.innerHTML = filtered.map(item => {
+                // El buscador también respeta si debe ir a ficha o a explorer
+                const targetId = item.id;
+                const isMissionWithFicha = item.ficha_digital;
+                const finalUrl = isMissionWithFicha ? `ficha.html?id=${targetId}` : `explorer.html?id=${targetId}`;
+
+                return `
+                <div class="suggestion-item" onclick="window.location.href='${finalUrl}'">
+                    ${item.nombre} <span style="font-size:0.7rem; color:gray; float:right;">${item.tipo || item.empresa}</span>
+                </div>`;
+            }).join('');
+            list.style.display = "flex";
+        } else { list.style.display = "none"; }
+    }
+
+    // Función de respaldo para selección manual si se requiere
+    function selectSuggestion(id) { 
+        // Buscamos el item en la DB para ver si es ficha o explorer
+        const item = orbitDB.find(i => i.id === id);
+        const url = (item && item.ficha_digital) ? `ficha.html?id=${id}` : `explorer.html?id=${id}`;
+        window.location.href = url;
+    }
+
+    function handleEnter(event) {
+        if (event.key === "Enter") {
+            const query = document.getElementById('mainSearch').value;
+            window.location.href = `explorer.html?q=${query}`;
+        }
+    }
+
+    // Cerrar sugerencias al hacer clic fuera del buscador
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+            document.getElementById('suggestions').style.display = "none";
+        }
+    });
+
+    // --- 4. INICIALIZACIÓN ---
+    loadMissionsIndex();
+    loadDatabase();
+    getApod();
+</script>
+</body>
+</html>

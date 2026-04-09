@@ -1,0 +1,46 @@
+{
+  "cuerpos_celestes": [
+    {
+      "id": "Saturno",
+      "nombre": "Saturno",
+      "tipo": "Planeta",
+      "descripcion": "El gigante gaseoso famoso por su sistema de anillos.",
+      "imagen": "https://images-assets.nasa.gov/image/PIA01364/PIA01364~thumb.jpg",
+      "link": "explorer.html?id=saturno"
+    },
+    {
+      "id": "marte",
+      "nombre": "Marte",
+      "tipo": "Planeta",
+      "descripcion": "El planeta rojo, objetivo principal de la colonización humana.",
+      "imagen": "https://images-assets.nasa.gov/image/PIA04352/PIA04352~thumb.jpg",
+      "link": "explorer.html?id=marte"
+    },
+    {
+      "id": "luna",
+      "nombre": "La Luna",
+      "tipo": "Satélite",
+      "descripcion": "Nuestro satélite natural y sitio de la misión Artemis.",
+      "imagen": "https://images-assets.nasa.gov/image/PIA00405/PIA00405~thumb.jpg",
+      "link": "explorer.html?id=luna"
+    }
+  ],
+  "misiones": [
+    {
+      "id": "artemis-2",
+      "nombre": "Artemis II",
+      "empresa": "Misión Espacial",
+      "estado": "En curso",
+      "descripcion": "Primera misión tripulada del programa Artemis a la Luna.",
+      "link": "live.html"
+    },
+    {
+      "id": "starship-4",
+      "nombre": "Starship IFT-4",
+      "empresa": "SpaceX",
+      "estado": "Próximamente",
+      "descripcion": "Cuarta prueba de vuelo del sistema de transporte de SpaceX.",
+      "link": "explorer.html?id=starship"
+    }
+  ]
+}

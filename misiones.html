@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivo de Misiones - Orbit Zero</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos específicos para el historial */
+        .mission-card {
+            background: var(--glass);
+            border: 1px solid #333;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .mission-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .mission-header:hover { background: rgba(255,255,255,0.03); }
+        
+        .mission-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: rgba(0,0,0,0.2);
+            padding: 0 20px;
+        }
+        .mission-content.active {
+            max-height: 500px; /* Suficiente para el contenido */
+            padding: 20px;
+            border-top: 1px solid #222;
+        }
+
+        .btn-ficha {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--orbit-blue);
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        
+        .status-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .status-completada { background: #444; color: #aaa; }
+ /* Estados adicionales */
+.status-proximamente { 
+    border: 1px solid var(--orbit-blue); 
+    color: var(--orbit-blue); 
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+}
+
+.status-fallida { 
+    background: #ff4444; 
+    color: white; 
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.status-en-curso { 
+    background: #ff9800; 
+    color: black; 
+    animation: pulse-status 2s infinite;
+}
+
+@keyframes pulse-status {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="section-container">
+        <a href="index.html" style="color:var(--orbit-blue); text-decoration:none; font-weight:bold; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 10px var(--orbit-blue)'" onmouseout="this.style.textShadow='none'">← VOLVER AL MANDO</a>
+        
+        <h1 style="margin-top:20px; letter-spacing: 1px;">Archivo de Misiones</h1>
+        <p style="color: #666; margin-bottom: 30px; font-size: 0.9rem;">Historial completo y telemetría de la exploración espacial coordinada.</p>
+
+        <div id="misiones-lista">
+            </div>
+    </div>
+
+    <script>
+        async function loadMissionsHistory() {
+            try {
+                const res = await fetch('missions.json');
+                const missions = await res.json();
+                const container = document.getElementById('misiones-lista');
+
+                container.innerHTML = missions.map(m => {
+                    const botonFicha = m.ficha_digital 
+                        ? `<a href="ficha.html?id=${m.id}" class="btn-ficha">Ver Ficha Digital Completa</a>` 
+                        : '';
+
+                    // --- LÓGICA DE TELEMETRÍA DINÁMICA ---
+                    let techPreview = '';
+                    if (m.detalles_tecnicos) {
+                        // Solo mostramos velocidad si la misión está "en-curso"
+                        const showSpeed = (m.estado === "en-curso" && m.detalles_tecnicos.velocidad_actual);
+                        
+                        techPreview = `
+                            <div style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+                                <div style="font-size:0.75rem;">
+                                    <span style="color:var(--orbit-blue); display:block; font-weight:bold; text-transform:uppercase; font-size:0.6rem;">Nave / Vehículo</span>
+                                    ${m.detalles_tecnicos.nave || 'N/A'}
+                                </div>
+                                ${showSpeed ? `
+                                <div style="font-size:0.75rem;">
+                                    <span style="color:#ff9800; display:block; font-weight:bold; text-transform:uppercase; font-size:0.6rem;">Velocidad en tiempo real</span>
+                                    ${m.detalles_tecnicos.velocidad_actual}
+                                </div>
+                                ` : `
+                                <div style="font-size:0.75rem;">
+                                    <span style="color:#666; display:block; font-weight:bold; text-transform:uppercase; font-size:0.6rem;">Referencia</span>
+                                    Misión ${m.estado.replace('-', ' ')}
+                                </div>
+                                `}
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="mission-card">
+                            <div class="mission-header" onclick="toggleDetails(this)">
+                                <div>
+                                    <h3 style="margin:0; font-size:1.1rem; color:white;">${m.nombre}</h3>
+                                    <span style="font-size:0.8rem; color:#666;">${m.empresa} | ${m.fecha}</span>
+                                </div>
+                                <span class="status-tag status-${m.estado}">${m.estado.replace('-', ' ')}</span>
+                            </div>
+                            <div class="mission-content">
+                                <p style="margin:0; color:#ccc; line-height:1.6; font-size:0.9rem;">${m.descripcion}</p>
+                                ${techPreview}
+                                ${botonFicha}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) { 
+                console.error("Error:", e);
+                container.innerHTML = "<p style='color:red;'>Error de conexión con la base de datos.</p>";
+            }
+        }
+
+        function toggleDetails(element) {
+            const content = element.nextElementSibling;
+            const allContent = document.querySelectorAll('.mission-content');
+            allContent.forEach(item => {
+                if (item !== content) item.classList.remove('active');
+            });
+            content.classList.toggle('active');
+        }
+
+        loadMissionsHistory();
+    </script>
+</body>
+</body>
+</html>
